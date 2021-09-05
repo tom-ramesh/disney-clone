@@ -1,11 +1,13 @@
 import React from "react";
 import ImageSlider from "./ImageSlider";
+import Viewers from "./Viewers";
 import styled from "styled-components";
 
 const Home = () => {
   return (
     <Container>
       <ImageSlider />
+      <Viewers />
     </Container>
   );
 };
@@ -16,6 +18,7 @@ const Container = styled.main`
   position: relative;
   min-height: calc(100vh - 70px);
   padding: 0 calc(3.5vw + 5px);
+  overflow-x: hidden;
 
   &::before {
     content: "";

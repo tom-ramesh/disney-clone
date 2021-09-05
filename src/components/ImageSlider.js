@@ -11,20 +11,63 @@ const ImageSlider = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoPlay: true,
+    autoplay: true,
   };
+
+  const sliderImages = [
+    { key: 1, src: "/images/slider-badging.jpg" },
+    { key: 2, src: "/images/slider-badag.jpg" },
+  ];
 
   return (
     <Carousel {...settings}>
-      <Wrap>
-        <img src="/images/slider-badging.jpg" alt="" />
-      </Wrap>
+      {sliderImages.map(({ key, src }) => (
+        <Wrap key={key}>
+          <img src={src} alt="" />
+        </Wrap>
+      ))}
     </Carousel>
   );
 };
 
 export default ImageSlider;
 
-const Carousel = styled(Slider)``;
+const Carousel = styled(Slider)`
+  margin-top: 20px;
 
-const Wrap = styled.div``;
+  ul li button {
+    &::before {
+      font-size: 10px;
+      color: rgb(150, 158, 171);
+    }
+  }
+
+  li.slick-active button::before {
+    color: grey;
+  }
+
+  .slick-list {
+    overflow: visible;
+  }
+
+  button {
+    z-index: 1;
+  }
+`;
+
+const Wrap = styled.div`
+  cursor: pointer;
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    border: 4px solid transparent;
+    box-shadow: rgb(0 0 0 /69%) 0px 26px 30px -10px,
+      rgb(0 0 0 /73%) 0px 16px 10px -10px;
+    transition-duration: 300ms;
+
+    &:hover {
+      border: 4px solid rgba(249, 249, 249, 0.8);
+    }
+  }
+`;
