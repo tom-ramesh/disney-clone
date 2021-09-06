@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useParams } from "react-router";
+import db from "../firebase";
+import { collection, doc, getDoc } from "firebase/firestore";
 import styled from "styled-components";
 
 const Detail = () => {
+  const { id } = useParams();
+
+  useEffect(() => {
+    const movieData = collection(db, "movies");
+    const movieRef = doc(movieData, "movies");
+    const movie = getDoc(movieRef).then((doc) => {
+      if (doc) {
+      }
+    });
+  }, []);
+
   return (
     <Container>
       <Background>
