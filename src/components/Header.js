@@ -1,7 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { auth, provider } from "../firebase";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import styled from "styled-components";
+import {
+  selectUserName,
+  selectUserPhoto,
+  setUserLogin,
+  setSignOut,
+} from "../features/user/useSlice";
+import { useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const userName = useSelector(selectUserName);
+  const userPhoto = useSelector(selectUserPhoto);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        dispatch(
+          setUserLogin({
+            name: user.displayName,
+            email: user.email,
+            photo: user.photoURL,
+          })
+        );
+        history.push("/");
+      }
+    });
+  }, []);
+
   const menuProps = [
     { key: 1, src: "/images/home-icon.svg", name: "HOME" },
     { key: 2, src: "/images/search-icon.svg", name: "SEARCH" },
@@ -11,18 +41,52 @@ const Header = () => {
     { key: 6, src: "/images/series-icon.svg", name: "SERIES" },
   ];
 
+  const signIn = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        let user = result.user;
+        dispatch(
+          setUserLogin({
+            name: user.displayName,
+            email: user.email,
+            photo: user.photoURL,
+          })
+        );
+        history.push("/");
+      })
+      .catch((error) => console.log(error.message));
+  };
+
+  const signOutFn = () => {
+    signOut(auth).then(() => {
+      dispatch(setSignOut());
+      history.push("/login");
+    });
+  };
+
   return (
     <Nav>
       <Logo src="/images/logo.svg" />
-      <NavMenu>
-        {menuProps.map(({ src, name, key }) => (
-          <a key={key}>
-            <img src={src} />
-            <span>{name}</span>
-          </a>
-        ))}
-      </NavMenu>
-      <UserImage src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyEaZqT3fHeNrPGcnjLLX1v_W4mvBlgpwxnA&usqp=CAU" />
+      {!userName ? (
+        <LoginContainer>
+          <Login onClick={signIn}>Login</Login>
+        </LoginContainer>
+      ) : (
+        <>
+          <NavMenu>
+            {menuProps.map(({ src, name, key }) => (
+              <a key={key}>
+                <img src={src} />
+                <span>{name}</span>
+              </a>
+            ))}
+          </NavMenu>
+          <UserImage
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyEaZqT3fHeNrPGcnjLLX1v_W4mvBlgpwxnA&usqp=CAU"
+            onClick={signOutFn}
+          />
+        </>
+      )}
     </Nav>
   );
 };
@@ -91,4 +155,27 @@ const UserImage = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
+`;
+
+const Login = styled.div`
+  cursor: pointer;
+  padding: 8px 16px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid #f9f9f9;
+  border-radius: 4px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #f9f9f9;
+    color: #000;
+    border-color: transparent;
+  }
+`;
+
+const LoginContainer = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
 `;
